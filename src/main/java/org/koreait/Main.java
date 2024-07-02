@@ -7,28 +7,17 @@ import java.util.Scanner;
 public class Main {
 
     static List<Article> articles = new ArrayList<>();
+    static List<Member> members = new ArrayList<>();
 
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
-        System.out.println("== 회원가입 ==");
-        int id = 1;
-        String regDate = Util.getNow();
-        System.out.print("ID : ");
-        String loginId = sc.nextLine();
-        System.out.print("PW : ");
-        String loginPw = sc.nextLine();
-        System.out.print("NAME : ");
-        String name = sc.nextLine();
-
-        Member(id, regDate, loginId, loginPw, name);
-        id++;
-
 
         System.out.println("==프로그램 시작==");
 
         makeTestData();
 
         int lastArticleId = 0;
+        int memberId = 1;
 
 
         while (true) {
@@ -45,7 +34,7 @@ public class Main {
 
             if (cmd.equals("article write")) {
                 System.out.println("==게시글 작성==");
-                int number = lastArticleId + 1;
+                int id = lastArticleId + 1;
                 String regDate2 = Util.getNow();
                 String updateDate = regDate2;
                 System.out.print("제목 : ");
@@ -53,18 +42,18 @@ public class Main {
                 System.out.print("내용 : ");
                 String body = sc.nextLine();
 
-                Article article = new Article(number, regDate2, updateDate, title, body);
+                Article article = new Article(id, regDate2, updateDate, title, body);
                 articles.add(article);
 
-                System.out.println(number + "번 글이 생성되었습니다");
+                System.out.println(id + "번 글이 생성되었습니다");
                 lastArticleId++;
-            } else if (cmd.contains("list")) {
+            } else if (cmd.contains("article list")) {
                 String[] cmds = cmd.split(" ");
                 if (cmds.length == 2) {
-                    System.out.println("==게시글 목록==");
                     if (articles.size() == 0) {
                         System.out.println("아무것도 없어");
                     } else {
+                        System.out.println("==게시글 목록==");
                         System.out.println("  번호   /    날짜   /   제목   /   내용   ");
                         for (int i = articles.size() - 1; i >= 0; i--) {
                             Article article = articles.get(i);
@@ -76,11 +65,11 @@ public class Main {
                         }
                     }
                 } else if (cmds.length == 3) {
-                    int w = 0;
-                    System.out.println("==게시글 목록==");
                     if (articles.size() == 0) {
                         System.out.println("아무것도 없어");
                     } else {
+                        int w = 0;
+                        System.out.println("==게시글 목록==");
                         System.out.println("  번호   /    날짜   /   제목   /   내용   ");
                         for (int i = articles.size() - 1; i >= 0; i--) {
                             Article article = articles.get(i);
@@ -90,16 +79,19 @@ public class Main {
                                 } else {
                                     System.out.printf("  %d   /   %s      /   %s   /   %s  \n", article.getId(), article.getRegDate().split(" ")[0], article.getTitle(), article.getBody());
                                 }
-                            } else {w = -1;}
-                        } if(w == -1) System.out.println("해당 단어를 포함한 게시글이 없습니다");
+                            } else {
+                                w = -1;
+                            }
+                        }
+                        if (w == -1) System.out.println("해당 단어를 포함한 게시글이 없습니다");
                     }
                 }
             } else if (cmd.startsWith("article detail")) {
                 System.out.println("==게시글 상세보기==");
 
-                int number = Integer.parseInt(cmd.split(" ")[2]);
+                int id = Integer.parseInt(cmd.split(" ")[2]);
 
-                Article foundArticle = getArticleById(number);
+                Article foundArticle = getArticleById(id);
 
                 if (foundArticle == null) {
                     System.out.println("해당 게시글은 없습니다");
@@ -114,9 +106,9 @@ public class Main {
             } else if (cmd.startsWith("article delete")) {
                 System.out.println("==게시글 삭제==");
 
-                int number = Integer.parseInt(cmd.split(" ")[2]);
+                int id = Integer.parseInt(cmd.split(" ")[2]);
 
-                Article foundArticle = getArticleById(number);
+                Article foundArticle = getArticleById(id);
 
                 if (foundArticle == null) {
                     System.out.println("해당 게시글은 없습니다");
@@ -128,9 +120,9 @@ public class Main {
             } else if (cmd.startsWith("article modify")) {
                 System.out.println("==게시글 수정==");
 
-                int number = Integer.parseInt(cmd.split(" ")[2]);
+                int id = Integer.parseInt(cmd.split(" ")[2]);
 
-                Article foundArticle = getArticleById(number);
+                Article foundArticle = getArticleById(id);
 
                 if (foundArticle == null) {
                     System.out.println("해당 게시글은 없습니다");
@@ -147,7 +139,38 @@ public class Main {
                 foundArticle.setBody(newBody);
                 foundArticle.setUpdateDate(Util.getNow());
 
-                System.out.println(number + "번 게시글이 수정되었습니다");
+                System.out.println(id + "번 게시글이 수정되었습니다");
+            } else if (cmd.startsWith("member")) {
+                System.out.println("== 회원가입 ==");
+                String regDate = Util.getNow();
+                System.out.print("ID : ");
+                String loginId = sc.nextLine();
+                while (true) {
+                    String foundMemberId = getMemberLoginId(loginId);
+                    if (foundMemberId != null) break;
+                    if (foundMemberId == null) {
+                        System.out.println("중복된 ID 입니다 다시 입력해주세요");
+                        System.out.print("ID : ");
+                        loginId = sc.nextLine();
+                    }
+                }
+                System.out.print("PW : ");
+                String loginPw = sc.nextLine();
+                while (true) {
+                    System.out.print("PW 재확인 : ");
+                    String loginPw2 = sc.nextLine();
+                    if (!loginPw.equals(loginPw2)) System.out.println("PW를 다시 확인해주세요");
+                    if (loginPw.equals(loginPw2)) break;
+                }
+                System.out.print("NAME : ");
+                String name = sc.nextLine();
+
+                Member member = new Member(memberId, regDate, loginId, loginPw, name);
+                members.add(member);
+                memberId++;
+
+                System.out.println("회원가입이 완료되었습니다.");
+
             } else {
                 System.out.println("사용할 수 없는 명령어입니다");
             }
@@ -158,13 +181,22 @@ public class Main {
 
     }
 
-    private static Article getArticleById(int number) {
+    private static Article getArticleById(int id) {
         for (Article article : articles) {
-            if (article.getId() == number) {
+            if (article.getId() == id) {
                 return article;
             }
         }
         return null;
+    }
+
+    private static String getMemberLoginId(String loginId) {
+        for (Member member : members) {
+            if (member.getLoginId().equals(loginId)) {
+                return null;
+            }
+        }
+        return loginId;
     }
 
     private static void makeTestData() {
@@ -172,9 +204,5 @@ public class Main {
         articles.add(new Article(-1, "2023-12-12 12:12:12", "2023-12-12 12:12:12", "제목1", "내용1"));
         articles.add(new Article(-2, Util.getNow(), Util.getNow(), "제목2", "내용2"));
         articles.add(new Article(-3, Util.getNow(), Util.getNow(), "제목3", "내용3"));
-    }
-
-    private static void Member(int id,String regDate,String loginId,String loginPw,String name){
-        System.out.println("회원가입이 완료되었습니다.");
     }
 }
