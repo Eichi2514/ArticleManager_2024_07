@@ -1,6 +1,5 @@
 package org.koreait;
 
-import java.lang.reflect.Member;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -100,14 +99,7 @@ public class Main {
 
                 int number = Integer.parseInt(cmd.split(" ")[2]);
 
-                Article foundArticle = null;
-
-                for (Article article : articles) {
-                    if (article.getId() == number) {
-                        foundArticle = article;
-                        break;
-                    }
-                }
+                Article foundArticle = getArticleById(number);
 
                 if (foundArticle == null) {
                     System.out.println("해당 게시글은 없습니다");
@@ -124,14 +116,7 @@ public class Main {
 
                 int number = Integer.parseInt(cmd.split(" ")[2]);
 
-                Article foundArticle = null;
-
-                for (Article article : articles) {
-                    if (article.getId() == number) {
-                        foundArticle = article;
-                        break;
-                    }
-                }
+                Article foundArticle = getArticleById(number);
 
                 if (foundArticle == null) {
                     System.out.println("해당 게시글은 없습니다");
@@ -145,14 +130,7 @@ public class Main {
 
                 int number = Integer.parseInt(cmd.split(" ")[2]);
 
-                Article foundArticle = null;
-
-                for (Article article : articles) {
-                    if (article.getId() == number) {
-                        foundArticle = article;
-                        break;
-                    }
-                }
+                Article foundArticle = getArticleById(number);
 
                 if (foundArticle == null) {
                     System.out.println("해당 게시글은 없습니다");
@@ -178,6 +156,15 @@ public class Main {
         System.out.println("==프로그램 종료==");
         sc.close();
 
+    }
+
+    private static Article getArticleById(int number) {
+        for (Article article : articles) {
+            if (article.getId() == number) {
+                return article;
+            }
+        }
+        return null;
     }
 
     private static void makeTestData() {
