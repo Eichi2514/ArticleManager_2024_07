@@ -1,21 +1,25 @@
-package org.koreait;
+package org.koreait.controller;
+
+import org.koreait.dto.Member;
+import org.koreait.util.Util;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-public class MemberController {
+public class MemberController extends Controller {
     private Scanner sc;
     private List<Member> members;
-    private boolean loginCheck = false;
-    private int memberId = 4;
+    private String cmd;
+    private int loginCheck = 0;
+    private int id = 4;
 
     public MemberController(Scanner sc) {
         this.sc = sc;
         members = new ArrayList<>();
     }
 
-    public void add() {
+    public void join() {
         System.out.println("== 회원가입 ==");
         String regDate = Util.getNow();
         System.out.print("ID : ");
@@ -40,9 +44,9 @@ public class MemberController {
         System.out.print("이름 : ");
         String name = sc.nextLine();
 
-        Member member = new Member(memberId, regDate, loginId, loginPw, name);
+        Member member = new Member(id, regDate, loginId, loginPw, name);
         members.add(member);
-        memberId++;
+        id++;
 
         System.out.println("회원가입이 완료되었습니다.");
     }
@@ -58,18 +62,19 @@ public class MemberController {
 
     public void makeTestId() {
         System.out.println("테스트 ID 생성");
-        members.add(new Member(1, Util.getNow(), "testLoginId1", "testLoginPw1", "testName1"));
+        members.add(new Member(1, Util.getNow(), "asd", "asd", "testName1"));
         members.add(new Member(2, Util.getNow(), "testLoginId2", "testLoginPw2", "testName2"));
         members.add(new Member(3, Util.getNow(), "testLoginId3", "testLoginPw3", "testName3"));
     }
 
-    public void login() {
-        if (loginCheck) {
+    public int login() {
+        if (loginCheck != 0) {
             System.out.println("먼저 로그아웃을 해주세요.");
-            return;
+            return 0;
         }
         System.out.println("== 로그인 ==");
         int loginIdCheck = -1;
+        int loginError = 0;
         while (true) {
             System.out.print("ID : ");
             String loginId = sc.nextLine();
@@ -81,7 +86,12 @@ public class MemberController {
                 }
             }
             if (loginIdCheck == -1) {
-                System.out.println("ID가 존재하지 않습니다.");
+                System.out.printf("ID가 존재하지 않습니다. %d\n", (3 - loginError));
+                loginError++;
+                if (loginError > 2) {
+                    System.out.println("== 로그인(ID) 실패 ==");
+                    return 0;
+                }
             } else if (loginIdCheck != -1) {
                 Member member = members.get(loginIdCheck);
                 if (member.getLoginId().equals(loginId)) {
@@ -89,27 +99,55 @@ public class MemberController {
                 }
             }
         }
-        while (true) {
+        loginError = 0;
+        while (loginIdCheck >= 0) {
             Member member = members.get(loginIdCheck);
             System.out.print("PW : ");
             String loginPw = sc.nextLine();
             if (member.getLoginPw().equals(loginPw)) {
                 break;
+            } else if (loginError > 2) {
+                System.out.println("== 로그인(PW) 실패 ==");
+                return 0;
             } else {
-                System.out.println("PW가 틀렸습니다.");
+                System.out.printf("PW가 틀렸습니다. %d\n", (3 - loginError));
+                loginError++;
             }
         }
+        loginCheck = id;
         System.out.println("로그인 되었습니다");
-        loginCheck = true;
+
+        return loginCheck;
     }
 
     public void logout() {
-        if (loginCheck == false) {
-            System.out.println("먼저 로그인을 해주세요.");
+        if (loginCheck == 0) {
+            System.out.println("로그아웃 상태입니다.");
             return;
         }
         System.out.println("로그아웃 되었습니다.");
-        loginCheck = false;
+        loginCheck = 0;
+    }
+
+    @Override
+    public void doAction(String cmd, String actionMethodName) {
+        this.cmd = cmd;
+        this.loginCheck = loginCheck;
+
+        switch (actionMethodName) {
+            case "join":
+                join();
+                break;
+            case "login":
+                login();
+                break;
+            case "logout":
+                logout();
+                break;
+            default:
+                System.out.println("명령어 확인 (actionMethodName) 오류");
+                break;
+        }
     }
 }
 

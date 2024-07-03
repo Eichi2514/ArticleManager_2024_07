@@ -1,12 +1,16 @@
-package org.koreait;
+package org.koreait.controller;
+
+import org.koreait.dto.Article;
+import org.koreait.util.Util;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-public class ArticleController {
+public class ArticleController extends Controller  {
     private Scanner sc;
     private List<Article> articles;
+    private String cmd;
     private int lastArticleId = 3;
 
     public ArticleController(Scanner sc) {
@@ -36,7 +40,7 @@ public class ArticleController {
         lastArticleId++;
     }
 
-    public void list(String cmd) {
+    public void list() {
         String[] cmds = cmd.split(" ");
         if (cmds.length == 2) {
             if (articles.size() == 0) {
@@ -78,7 +82,7 @@ public class ArticleController {
         }
     }
 
-    public void detail(String cmd) {
+    public void detail() {
         System.out.println("==게시글 상세보기==");
 
         int id = Integer.parseInt(cmd.split(" ")[2]);
@@ -97,10 +101,15 @@ public class ArticleController {
 
     }
 
-    public void delete(String cmd) {
+    public void delete() {
         System.out.println("==게시글 삭제==");
 
         int id = Integer.parseInt(cmd.split(" ")[2]);
+
+        if (id < 4) {
+            System.out.println("접근이 제한된 게시글 입니다");
+            return;
+        }
 
         Article foundArticle = getArticleById(id);
 
@@ -113,7 +122,7 @@ public class ArticleController {
 
     }
 
-    public void modify(String cmd) {
+    public void modify() {
         System.out.println("==게시글 수정==");
 
         int id = Integer.parseInt(cmd.split(" ")[2]);
@@ -147,6 +156,32 @@ public class ArticleController {
             }
         }
         return null;
+    }
+
+    @Override
+    public void doAction(String cmd, String actionMethodName) {
+        this.cmd = cmd;
+
+        switch (actionMethodName) {
+            case "write":
+                write();
+                break;
+            case "list":
+                list();
+                break;
+            case "detail":
+                detail();
+                break;
+            case "modify":
+                modify();
+                break;
+            case "delete":
+                delete();
+                break;
+            default:
+                System.out.println("명령어 확인 (actionMethodName) 오류");
+                break;
+        }
     }
 
     public void makeTestData() {

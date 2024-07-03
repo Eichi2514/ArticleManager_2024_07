@@ -1,14 +1,12 @@
-package org.koreait;
+package org.koreait.dto;
 
-class Member {
-    private int memberId;
-    private String regDate;
+public class Member extends Dto{
     private String loginId;
     private String loginPw;
     private String name;
 
-    public Member(int memberId, String regDate, String loginId, String loginPw, String name) {
-        this.memberId = memberId;
+    public Member(int id, String regDate, String loginId, String loginPw, String name) {
+        this.id = id;
         this.regDate = regDate;
         this.loginId = loginId;
         this.loginPw = loginPw;
@@ -24,11 +22,11 @@ class Member {
     }
 
     public int getMemberId() {
-        return memberId;
+        return id;
     }
 
-    public void setMemberId(int memberId) {
-        this.memberId = memberId;
+    public void setMemberId(int id) {
+        this.id = id;
     }
 
     public String getLoginId() {
