@@ -39,7 +39,8 @@ public class ArticleController extends Controller {
         System.out.print("내용 : ");
         String body = sc.nextLine();
         int memberId = Controller.isLoginCheck().getId();
-        Article article = new Article(id, regDate, updateDate, memberId, title, body);
+        String memberName = Controller.isLoginCheck().getName();
+        Article article = new Article(id, regDate, updateDate, memberId, memberName, title, body);
         articles.add(article);
 
         System.out.println(id + "번 글이 생성되었습니다");
@@ -53,16 +54,15 @@ public class ArticleController extends Controller {
                 System.out.println("작성된 글이 없습니다");
             } else {
                 System.out.println("==게시글 목록==");
-                System.out.println("  번호   /    날짜   /    작성자   /     제목     /   내용   ");
+                System.out.println("  번호   / 날짜      / 작성자  /     제목     /   내용   ");
                 for (int i = articles.size() - 1; i >= 0; i--) {
                     Article article = articles.get(i);
-                    Member loginCheck = members.get(i);
                     if (Util.getNow().split(" ")[0].equals(article.getRegDate().split(" ")[0])) {
-                        System.out.printf("  %d   /  %s  /     %s      /     %s    /   %s      \n",
-                                article.getId(), article.getRegDate().split(" ")[1], loginCheck.getName(), article.getTitle(), article.getBody());
+                        System.out.printf("  %d   /  %s  / %s /     %s    /   %s      \n",
+                                article.getId(), article.getRegDate().split(" ")[1], article.getMemberName(), article.getTitle(), article.getBody());
                     } else {
-                        System.out.printf("  %d   / %s /     %s      /     %s    /   %s      \n",
-                                article.getId(), article.getRegDate().split(" ")[0], loginCheck.getName(), article.getTitle(), article.getBody());
+                        System.out.printf("  %d   / %s / %s /     %s    /   %s      \n",
+                                article.getId(), article.getRegDate().split(" ")[0], article.getMemberName(), article.getTitle(), article.getBody());
                     }
                 }
             }
@@ -71,20 +71,20 @@ public class ArticleController extends Controller {
                 System.out.println("작성된 글이 없습니다");
             } else {
                 boolean listCheck = true;
-
-                for (int i = articles.size() - 1; i >= 0; i--) {
+                if (listCheck) {
                     System.out.println("==게시글 목록==");
-                    System.out.println("  번호   /    날짜   /    작성자   /     제목    /   내용   ");
+                    System.out.println("  번호   / 날짜      / 작성자  /     제목    /   내용   ");
+                }
+                for (int i = articles.size() - 1 ; i >= 0; i--) {
                     Article article = articles.get(i);
-                    Member loginCheck = members.get(i);
                     if (article.getTitle().contains(cmds[2])) {
                         listCheck = false;
                         if (Util.getNow().split(" ")[0].equals(article.getRegDate().split(" ")[0])) {
-                            System.out.printf("  %d   /  %s  /     %s      /     %s    /   %s      \n",
-                                    article.getId(), article.getRegDate().split(" ")[1], loginCheck.getName(), article.getTitle(), article.getBody());
+                            System.out.printf("  %d   /  %s  / %s /     %s    /   %s      \n",
+                                    article.getId(), article.getRegDate().split(" ")[1], article.getMemberName(), article.getTitle(), article.getBody());
                         } else {
-                            System.out.printf("  %d   / %s /     %s      /     %s    /   %s      \n",
-                                    article.getId(), article.getRegDate().split(" ")[0], loginCheck.getName(), article.getTitle(), article.getBody());
+                            System.out.printf("  %d   / %s / %s /     %s    /   %s      \n",
+                                    article.getId(), article.getRegDate().split(" ")[0], article.getMemberName(), article.getTitle(), article.getBody());
                         }
                     }
                 }
@@ -205,9 +205,9 @@ public class ArticleController extends Controller {
 
     public void makeTestData() {
         System.out.println("테스트 데이터 생성");
-        articles.add(new Article(1, Util.getNow(), Util.getNow(), 1, "제목1", "내용1"));
-        articles.add(new Article(2, Util.getNow(), Util.getNow(), 2, "제목2", "내용2"));
-        articles.add(new Article(3, Util.getNow(), Util.getNow(), 3, "제목3", "내용3"));
+        articles.add(new Article(1, Util.getNow(), Util.getNow(), 1, "운영자1","제목1", "내용1"));
+        articles.add(new Article(2, Util.getNow(), Util.getNow(), 2, "운영자2","제목2", "내용2"));
+        articles.add(new Article(3, Util.getNow(), Util.getNow(), 3, "운영자3","제목3", "내용3"));
 
     }
 }
