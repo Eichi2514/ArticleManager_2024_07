@@ -1,5 +1,7 @@
 package org.koreait.controller;
 
+import org.koreait.articleManager.Container;
+import org.koreait.dto.Dto;
 import org.koreait.dto.Member;
 import org.koreait.util.Util;
 
@@ -9,17 +11,20 @@ import java.util.Scanner;
 
 public class MemberController extends Controller {
     private Scanner sc;
-    private List<Member> members;
+    public List<Member> members;
     private String cmd;
-    private int loginCheck = 0;
-    private int id = 4;
+    private int id = 3;
 
     public MemberController(Scanner sc) {
         this.sc = sc;
-        members = new ArrayList<>();
+        members = Container.memberDao.members;
     }
 
     public void join() {
+        if (loginCheck != null) {
+            System.out.println("로그인 중입니다.");
+            return;
+        }
         System.out.println("== 회원가입 ==");
         String regDate = Util.getNow();
         System.out.print("ID : ");
@@ -44,9 +49,9 @@ public class MemberController extends Controller {
         System.out.print("이름 : ");
         String name = sc.nextLine();
 
+        id++;
         Member member = new Member(id, regDate, loginId, loginPw, name);
         members.add(member);
-        id++;
 
         System.out.println("회원가입이 완료되었습니다.");
     }
@@ -62,15 +67,15 @@ public class MemberController extends Controller {
 
     public void makeTestId() {
         System.out.println("테스트 ID 생성");
-        members.add(new Member(1, Util.getNow(), "asd", "asd", "testName1"));
-        members.add(new Member(2, Util.getNow(), "testLoginId2", "testLoginPw2", "testName2"));
-        members.add(new Member(3, Util.getNow(), "testLoginId3", "testLoginPw3", "testName3"));
+        members.add(new Member(1, Util.getNow(), "asd", "asd", "운영자1"));
+        members.add(new Member(2, Util.getNow(), "testLoginId2", "testLoginPw2", "운영자2"));
+        members.add(new Member(3, Util.getNow(), "testLoginId3", "testLoginPw3", "운영자3"));
     }
 
-    public int login() {
-        if (loginCheck != 0) {
+    public void login() {
+        if (loginCheck != null) {
             System.out.println("먼저 로그아웃을 해주세요.");
-            return 0;
+            return;
         }
         System.out.println("== 로그인 ==");
         int loginIdCheck = -1;
@@ -90,7 +95,7 @@ public class MemberController extends Controller {
                 loginError++;
                 if (loginError > 2) {
                     System.out.println("== 로그인(ID) 실패 ==");
-                    return 0;
+                    return;
                 }
             } else if (loginIdCheck != -1) {
                 Member member = members.get(loginIdCheck);
@@ -108,31 +113,30 @@ public class MemberController extends Controller {
                 break;
             } else if (loginError > 2) {
                 System.out.println("== 로그인(PW) 실패 ==");
-                return 0;
+                return;
             } else {
                 System.out.printf("PW가 틀렸습니다. %d\n", (3 - loginError));
                 loginError++;
             }
         }
-        loginCheck = id;
+        Member member = members.get(loginIdCheck);
+        loginCheck = member;
         System.out.println("로그인 되었습니다");
 
-        return loginCheck;
     }
 
     public void logout() {
-        if (loginCheck == 0) {
+        if (loginCheck == null) {
             System.out.println("로그아웃 상태입니다.");
             return;
         }
         System.out.println("로그아웃 되었습니다.");
-        loginCheck = 0;
+        loginCheck = null;
     }
 
     @Override
     public void doAction(String cmd, String actionMethodName) {
         this.cmd = cmd;
-        this.loginCheck = loginCheck;
 
         switch (actionMethodName) {
             case "join":

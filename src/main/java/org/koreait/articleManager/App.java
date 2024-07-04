@@ -10,7 +10,6 @@ public class App {
     public void run() {
         Scanner sc = new Scanner(System.in);
         System.out.println("==프로그램 시작==");
-        int loginCheck = 0;
 
         MemberController memberController = new MemberController(sc);
         ArticleController articleController = new ArticleController(sc);
@@ -30,14 +29,14 @@ public class App {
                 continue;
             }
             if (cmd.equals("help")) {
-                System.out.println("  member join   : 회원가입");
-                System.out.println("  member login  : 로그인");
-                System.out.println("  member logout : 로그아웃");
-                System.out.println("article  write  : 글쓰기");
-                System.out.println("article  list   : 글목록");
-                System.out.println("article  detail : 글 자세히 보기");
-                System.out.println("article  modify : 글 수정");
-                System.out.println("article  delete : 글 삭제");
+                System.out.println("member join    : 회원가입");
+                System.out.println("member login   : 로그인");
+                System.out.println("member logout  : 로그아웃");
+                System.out.println("article write  : 글쓰기");
+                System.out.println("article list   : 글목록");
+                System.out.println("article detail : 글 자세히 보기");
+                System.out.println("article modify : 글 수정");
+                System.out.println("article delete : 글 삭제");
                 continue;
             }
             if (cmd.equals("exit")) {
@@ -49,14 +48,34 @@ public class App {
                 System.out.println("명령어를 확인해주세요");
                 continue;
             }
+
+            String forLoginCheck = controllerName + "/" + cmdBits[1];
+
+            switch (forLoginCheck) {
+                case "article/write":
+                case "article/delete":
+                case "article/modify":
+                case "member/logout":
+                    if (Controller.isLoginCheck() == null) {
+                        System.out.println("로그인 필요");
+                        continue;
+                    }
+                    break;
+            }
+
+            switch (forLoginCheck) {
+                case "member/login":
+                case "member/join":
+                    if (Controller.isLoginCheck() != null) {
+                        System.out.println("로그아웃 필요");
+                        continue;
+                    }
+                    break;
+            }
+
             String actionMethodName = cmdBits[1];
             if (controllerName.equals("article")) {
-                if (loginCheck !=0) {
                     controller = articleController;
-                } else {
-                    System.out.println("로그인을 먼저 해주세요");
-                    continue;
-                }
             } else if (controllerName.equals("member")) {
                 controller = memberController;
             } else {
